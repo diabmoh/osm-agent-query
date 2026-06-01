@@ -165,6 +165,19 @@
       "expect": { "has_map_link": true }
     },
     {
+      "id": "open-now-pharmacy",
+      "tool": "search_open_now",
+      "args": {
+        "category": "pharmacy",
+        "lat": 48.8584,
+        "lon": 2.2945,
+        "radius_m": 1500,
+        "limit": 5,
+        "at_time": "2026-06-01T14:00:00+02:00"
+      },
+      "expect": { "mock": true }
+    },
+    {
       "id": "compare-routes-paris",
       "tool": "compare_routes",
       "args": {

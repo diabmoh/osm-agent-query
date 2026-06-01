@@ -24,6 +24,7 @@ Skip for: reviews, traffic, indoor maps, non-geographic facts.
 |------|--------|
 | Resolve a place name | `geocode` |
 | What's near a point | `search_nearby` (compact) |
+| **Open right now** | `search_open_now` (not `search_nearby`) |
 | Survey a neighborhood | `search_in_area` or prompt `neighborhood_amenity_audit` |
 | Walk vs drive | `compare_routes` |
 | Single mode route | `route` |
@@ -42,6 +43,15 @@ Always read `summary` first, then `data`. Tell the user:
 - `plan_local_outing` — place + optional interest category
 - `neighborhood_amenity_audit` — area name
 - `commute_comparison` — from_place, to_place
+
+## search_open_now
+
+Use when the user says **open now**, **still open**, **open late**, **24h**, etc.
+
+- Pass `at_time` with timezone if not "now" (e.g. `2026-12-24T22:00:00+01:00`)
+- Optional `country_code` (`de`, `fr`) for public holidays
+- Default returns only **open** POIs; set `include_unknown: true` to include missing/ambiguous hours
+- Read `stats` in `data` for how many candidates were evaluated
 
 ## Rules
 

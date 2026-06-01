@@ -31,6 +31,10 @@ import {
   compareRoutesSchema,
   handleCompareRoutes,
 } from "../tools/compare-routes.js";
+import {
+  searchOpenNowSchema,
+  handleSearchOpenNow,
+} from "../tools/search-open-now.js";
 
 async function runTool<T>(
   handler: () => Promise<T>,
@@ -69,6 +73,17 @@ export function registerOsmTools(server: McpServer): void {
     },
     async (args) =>
       runTool(() => handleReverseGeocode(reverseGeocodeSchema.parse(args))),
+  );
+
+  server.registerTool(
+    "search_open_now",
+    {
+      description:
+        "Find POIs that are open right now (or at at_time) using OSM opening_hours evaluation. Fetches candidates with opening_hours tags, evaluates schedule, returns only open results by default. Prefer over search_nearby when the user asks for open now / still open / late night.",
+      inputSchema: searchOpenNowSchema.shape,
+    },
+    async (args) =>
+      runTool(() => handleSearchOpenNow(searchOpenNowSchema.parse(args))),
   );
 
   server.registerTool(

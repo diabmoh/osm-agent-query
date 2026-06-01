@@ -37,11 +37,12 @@ OpenStreetMap is the world's largest **open** geodata commons—but agents break
 - Can't give users **clickable map links**
 - Pick the wrong tool from a **30+ tool** MCP buffet
 
-**osm-agent-query** fixes that with **9 focused tools**, an internal query planner, guardrails, and responses agents can actually use.
+**osm-agent-query** fixes that with **10 focused tools**, an internal query planner, guardrails, and responses agents can actually use.
 
 | | osm-agent-query | Typical OSM MCP |
 |--|-----------------|-----------------|
-| Tools | 9 + 3 workflow prompts | Often 20–30+ |
+| Tools | 10 + 3 workflow prompts | Often 20–30+ |
+| Open now | `search_open_now` + opening_hours.js | Manual tag guessing |
 | OverpassQL | Hidden (structured planner) | Often exposed |
 | User links | `map`, `osm`, `directions` on every POI | Rare |
 | POI extras | `phone`, `hours`, `website` highlights | Raw tags only |
@@ -66,6 +67,7 @@ OpenStreetMap is the world's largest **open** geodata commons—but agents break
 | `geocode` | Coordinates, bbox, **map link** |
 | `reverse_geocode` | Address + map link |
 | `search_nearby` | POIs by category, **sorted by distance**, links & highlights |
+| `search_open_now` | Same as nearby but **only open now** (evaluates `opening_hours`) |
 | `search_in_area` | POIs in a named place or bbox |
 | `route` | Distance, duration, polyline, **directions URL** |
 | `compare_routes` | Foot / drive / bike side-by-side + links |
@@ -200,9 +202,22 @@ Fine for demos and agent sessions. Production apps should self-host.
 **How is this different from [osm-mcp](https://github.com/GRABOSM/osm-mcp)?**  
 We optimize for **agent UX**: fewer tools, summaries, links, prompts, guardrails—not maximum API surface.
 
+### Example: pharmacies open now
+
+```json
+{
+  "category": "pharmacy",
+  "lat": 48.8584,
+  "lon": 2.2945,
+  "radius_m": 1200,
+  "at_time": "2026-06-01T21:00:00+02:00"
+}
+```
+
+Returns `open_status`, `hours_prettified`, `next_change_iso`, and `stats` (how many OSM objects were evaluated).
+
 ## 🗺 Roadmap
 
-- [ ] `search_open_now` using `opening_hours` evaluation
 - [ ] Optional route geometry stripping for token savings
 - [ ] npm publish + MCP registry listing
 

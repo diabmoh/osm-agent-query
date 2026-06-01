@@ -10,6 +10,7 @@ import { handleExplainTags } from "../src/tools/explain-tags.js";
 import { handlePreviewQuery } from "../src/tools/preview-query.js";
 import { handleMapLinks } from "../src/tools/map-links.js";
 import { handleCompareRoutes } from "../src/tools/compare-routes.js";
+import { handleSearchOpenNow } from "../src/tools/search-open-now.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dryRun = process.argv.includes("--dry-run");
@@ -40,6 +41,8 @@ const handlers: Record<
   map_links: (a) => handleMapLinks(a as Parameters<typeof handleMapLinks>[0]),
   compare_routes: (a) =>
     handleCompareRoutes(a as Parameters<typeof handleCompareRoutes>[0]),
+  search_open_now: (a) =>
+    handleSearchOpenNow(a as Parameters<typeof handleSearchOpenNow>[0]),
 };
 
 function checkExpect(

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0] - 2026-06-01
+
+### Added
+
+- `search_open_now` tool with OSM `opening_hours` evaluation via [opening_hours.js](https://github.com/opening-hours/opening_hours.js)
+- `at_time` (ISO 8601 + timezone), `include_unknown`, `country_code` for holiday-aware parsing
+- Overpass pre-filter for elements with `opening_hours` tag
+
 ## [0.3.0] - 2026-06-01
 
 ### Added

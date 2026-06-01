@@ -1,5 +1,16 @@
 # Use cases
 
+## Late-night / open now
+
+**Goal:** “What pharmacies are open near me right now?”
+
+1. `geocode` or use known coordinates
+2. `search_open_now` → `category: pharmacy`, `radius_m: 1500`
+3. Pass `at_time` with timezone if planning ahead (e.g. `2026-12-31T23:00:00+01:00`)
+4. Share `places[].links` and `hours_prettified` for top results
+
+Use `include_unknown: true` only if the user wants places without tagged hours.
+
 ## Travel & outings
 
 **Goal:** “What’s walkable near the Eiffel Tower?”
