@@ -29,6 +29,11 @@ export const searchNearbySchema = z.object({
   limit: z.number().int().optional(),
   tag_key: z.string().optional().describe("Custom OSM tag key (with category custom)"),
   tag_value: z.string().optional().describe("Custom OSM tag value"),
+  format: z
+    .enum(["compact", "full"])
+    .optional()
+    .default("compact")
+    .describe("compact: links + highlights; full: includes raw tags"),
 });
 
 export async function handleSearchNearby(
@@ -56,6 +61,7 @@ export async function handleSearchNearby(
   const summary = summarizeSearch(data.elements, label, {
     centerLat: args.lat,
     centerLon: args.lon,
+    format: args.format,
   });
   return toolSuccess(
     `Found ${summary.count} ${label}(s) within ${args.radius_m}m.`,

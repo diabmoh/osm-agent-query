@@ -1,4 +1,5 @@
 import { NOMINATIM_BASE } from "../config.js";
+import { cacheGet, cacheSet } from "../cache/geocode-cache.js";
 import { waitForNominatimSlot } from "../guardrails/rate-limiter.js";
 import { validateCoordinates } from "../guardrails/limits.js";
 import { osmJson } from "./http.js";
@@ -18,6 +19,10 @@ export async function geocodeQuery(
   query: string,
   limit = 5,
 ): Promise<NominatimResult[]> {
+  const cacheKey = `geocode:${query}:${limit}`;
+  const cached = cacheGet<NominatimResult[]>(cacheKey);
+  if (cached) return cached;
+
   await waitForNominatimSlot();
   const params = new URLSearchParams({
     q: query,
@@ -25,9 +30,11 @@ export async function geocodeQuery(
     addressdetails: "1",
     limit: String(Math.min(limit, 10)),
   });
-  return osmJson<NominatimResult[]>(
+  const results = await osmJson<NominatimResult[]>(
     `${NOMINATIM_BASE}/search?${params}`,
   );
+  cacheSet(cacheKey, results);
+  return results;
 }
 
 export async function reverseGeocode(

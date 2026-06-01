@@ -1,54 +1,51 @@
 ---
 name: osm-agent-query
-description: Use OpenStreetMap via the osm-agent-query MCP server for geocoding, POI search, routing, and tag validation. Prefer these tools over web search for location-specific facts.
+description: OpenStreetMap MCP for agents—geocode, search POIs with map links, compare routes, audit neighborhoods. Never write OverpassQL; use summaries and share links with users.
 ---
 
-# OpenStreetMap for agents
+# osm-agent-query
 
-## When to use
+## When to use OSM tools
 
-- User asks about **places, addresses, POIs, routes, or neighborhoods**
-- You need **coordinates**, **what is nearby**, or **walking/driving time**
-- You need to **validate OSM tags** before describing map features
+- Addresses, coordinates, **what's nearby**, routes, neighborhood amenities
+- User needs **OpenStreetMap links** to open in a browser
+- Validating tags (`explain_osm_tags`)
 
-Do **not** use for: general news, business reviews, live traffic, or indoor maps.
+Skip for: reviews, traffic, indoor maps, non-geographic facts.
 
-## Response format
+## Read first (MCP resources)
 
-Tools return JSON with:
+- `osm-agent://categories` — valid `category` values for search tools
+- `osm-agent://guide` — this skill in full
 
-- `ok: true`
-- `summary` — one-line human-readable result (cite this to the user)
-- `data` — structured payload (coordinates, places, route stats)
+## Best tools by task
 
-On failure: `{ error: true, code, message }`.
+| Task | Tools |
+|------|--------|
+| Resolve a place name | `geocode` |
+| What's near a point | `search_nearby` (compact) |
+| Survey a neighborhood | `search_in_area` or prompt `neighborhood_amenity_audit` |
+| Walk vs drive | `compare_routes` |
+| Single mode route | `route` |
+| Share map URL | `map_links` or use `links` on search results |
+| Debug empty search | `preview_query` |
 
-## Tool chain
+## Response contract
 
-1. `geocode` — place name → lat/lon (+ bbox)
-2. `search_nearby` or `search_in_area` — POIs by category
-3. `route` — distance/duration between points
-4. `explain_osm_tags` — tag help; `list_categories: true` for supported categories
-5. `preview_query` — debug only; shows planned Overpass without running it
+Always read `summary` first, then `data`. Tell the user:
 
-## Categories
+- Names, **distance_m**, **highlights** (hours, phone, website)
+- **`links.map`** and **`links.directions_from`** when relevant
 
-`restaurant`, `cafe`, `pharmacy`, `supermarket`, `hospital`, `school`, `parking`, `ev_charging`, `hotel`, `bank`, `fuel`, `park`, `library`, `museum`, `dentist`, `bakery`, `atm`, `post_office`, `bar`, `cinema`
+## Workflows (MCP prompts)
 
-Custom: `category: "custom"` + `tag_key` / `tag_value`.
+- `plan_local_outing` — place + optional interest category
+- `neighborhood_amenity_audit` — area name
+- `commute_comparison` — from_place, to_place
 
-## Tag pitfalls
+## Rules
 
-- Cafes: `amenity=cafe` vs `shop=coffee`
-- Fast food: `amenity=fast_food` (not `restaurant`)
-- EV: `amenity=charging_station`
-- Many nodes lack `name=*` — use `distance_m` and tags from `data.places`
-
-## Rate limits
-
-Nominatim: ~1 req/s (enforced server-side). Avoid rapid geocode loops.
-
-## Never
-
-- Do not write or execute OverpassQL — use structured tools only
-- Do not assume complete OSM coverage everywhere
+1. Never write OverpassQL
+2. Prefer `format: compact` unless you need full tags
+3. One geocode at a time (rate limit); repeated lookups are cached briefly
+4. OSM coverage varies—say when data may be incomplete

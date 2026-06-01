@@ -2,6 +2,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { registerOsmTools } from "./mcp/register-tools.js";
+import { registerOsmResources } from "./mcp/register-resources.js";
+import { registerOsmPrompts } from "./mcp/register-prompts.js";
 import { SERVER_NAME, VERSION } from "./version.js";
 
 const args = process.argv.slice(2);
@@ -16,6 +18,8 @@ const server = new McpServer({
 });
 
 registerOsmTools(server);
+registerOsmResources(server);
+registerOsmPrompts(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

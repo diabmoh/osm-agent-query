@@ -1,8 +1,12 @@
 import type { OverpassElement } from "../clients/overpass.js";
 import type { NominatimResult } from "../clients/nominatim.js";
 import { haversineM } from "../geo/haversine.js";
+import { linksForPlace, osmMapUrl } from "../osm/links.js";
+import { extractHighlights } from "../osm/tag-highlights.js";
 
-const MAX_TAGS_PER_PLACE = 8;
+const MAX_TAGS_PER_PLACE = 12;
+
+export type OutputFormat = "compact" | "full";
 
 export type PlaceSummary = {
   name: string;
@@ -11,6 +15,8 @@ export type PlaceSummary = {
   distance_m?: number;
   osm_id?: number;
   osm_type?: string;
+  links?: { map: string; osm?: string; directions_from?: string };
+  highlights?: Record<string, string>;
   tags?: Record<string, string>;
 };
 
@@ -22,6 +28,7 @@ export type GeocodeSummary = {
     lon: number;
     bbox?: { south: number; west: number; north: number; east: number };
     type?: string;
+    map_link: string;
   }>;
 };
 
@@ -54,6 +61,7 @@ export function summarizeGeocode(
         lon,
         bbox,
         type: r.type,
+        map_link: osmMapUrl(lat, lon),
       };
     }),
   };
@@ -64,23 +72,33 @@ export function summarizeReverse(r: NominatimResult): {
   lon: number;
   display_name: string;
   address?: Record<string, string>;
+  links: { map: string };
 } {
   const addr = (r as NominatimResult & { address?: Record<string, string> })
     .address;
+  const lat = Number(r.lat);
+  const lon = Number(r.lon);
   return {
-    lat: Number(r.lat),
-    lon: Number(r.lon),
+    lat,
+    lon,
     display_name: r.display_name,
     address: addr,
+    links: { map: osmMapUrl(lat, lon) },
   };
 }
 
 export function summarizeSearch(
   elements: OverpassElement[],
   categoryLabel: string,
-  opts?: { centerLat?: number; centerLon?: number },
+  opts?: {
+    centerLat?: number;
+    centerLon?: number;
+    format?: OutputFormat;
+  },
 ): { category: string; count: number; places: PlaceSummary[] } {
+  const format = opts?.format ?? "compact";
   const places: PlaceSummary[] = [];
+
   for (const el of elements) {
     const lat = el.lat ?? el.center?.lat;
     const lon = el.lon ?? el.center?.lon;
@@ -93,13 +111,12 @@ export function summarizeSearch(
       tags.shop ??
       `${el.type}/${el.id}`;
 
-    const place: PlaceSummary = {
-      name,
-      lat,
-      lon,
-      osm_id: el.id,
-      osm_type: el.type,
-    };
+    const place: PlaceSummary = { name, lat, lon };
+
+    if (el.id && el.type) {
+      place.osm_id = el.id;
+      place.osm_type = el.type;
+    }
 
     if (opts?.centerLat !== undefined && opts?.centerLon !== undefined) {
       place.distance_m = haversineM(
@@ -110,7 +127,20 @@ export function summarizeSearch(
       );
     }
 
-    if (Object.keys(tags).length) {
+    place.links = linksForPlace(
+      lat,
+      lon,
+      el.type,
+      el.id,
+      opts?.centerLat !== undefined && opts?.centerLon !== undefined
+        ? { lat: opts.centerLat, lon: opts.centerLon }
+        : undefined,
+    );
+
+    const highlights = extractHighlights(tags);
+    if (highlights) place.highlights = highlights;
+
+    if (format === "full" && Object.keys(tags).length) {
       place.tags = trimTags(tags);
     }
 
@@ -123,9 +153,5 @@ export function summarizeSearch(
     );
   }
 
-  return {
-    category: categoryLabel,
-    count: places.length,
-    places,
-  };
+  return { category: categoryLabel, count: places.length, places };
 }

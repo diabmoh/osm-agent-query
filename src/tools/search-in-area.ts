@@ -28,6 +28,7 @@ export const searchInAreaSchema = z.object({
   limit: z.number().int().optional(),
   tag_key: z.string().optional(),
   tag_value: z.string().optional(),
+  format: z.enum(["compact", "full"]).optional().default("compact"),
 });
 
 async function bboxFromPlace(place: string): Promise<Bbox> {
@@ -86,7 +87,9 @@ export async function handleSearchInArea(
 
   const intent = intentFromBbox(bbox, tagFilters, limit);
   const data = await executeSearchIntent(intent);
-  const summary = summarizeSearch(data.elements, label);
+  const summary = summarizeSearch(data.elements, label, {
+    format: args.format,
+  });
   return toolSuccess(
     `Found ${summary.count} ${label}(s) in ${areaLabel}.`,
     summary,

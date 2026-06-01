@@ -1,75 +1,95 @@
 <p align="center">
-  <strong>osm-agent-query</strong><br/>
-  Structured OpenStreetMap access for AI coding agents
+  <img src="https://raw.githubusercontent.com/diabmoh/osm-agent-query/main/docs/banner.svg" alt="osm-agent-query" width="640"/>
+</p>
+
+<h1 align="center">osm-agent-query</h1>
+
+<p align="center">
+  <strong>The OpenStreetMap MCP server built for AI agents</strong><br/>
+  Safe queries · Clickable map links · Ready-made workflows · Zero OverpassQL
 </p>
 
 <p align="center">
   <a href="https://github.com/diabmoh/osm-agent-query/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/diabmoh/osm-agent-query/ci.yml?branch=main&label=CI" alt="CI"/></a>
   <a href="https://www.npmjs.com/package/osm-agent-query"><img src="https://img.shields.io/npm/v/osm-agent-query?label=npm" alt="npm"/></a>
-  <img src="https://img.shields.io/node/v/osm-agent-query?label=node" alt="node"/>
+  <img src="https://img.shields.io/node/v/osm-agent-query?label=node%2020%2B" alt="node"/>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License"/></a>
+</p>
+
+<p align="center">
+  <a href="#-why-agents-love-it">Why</a> ·
+  <a href="#-tools">Tools</a> ·
+  <a href="#-quick-start">Quick start</a> ·
+  <a href="#-prompts--resources">Prompts</a> ·
+  <a href="#-example-output">Example</a> ·
+  <a href="docs/USE_CASES.md">Use cases</a> ·
+  <a href="docs/ARCHITECTURE.md">Architecture</a>
 </p>
 
 ---
 
-**osm-agent-query** is a [Model Context Protocol](https://modelcontextprotocol.io) server that lets Codex, Cursor, Cline, and other agents use [OpenStreetMap](https://www.openstreetmap.org) safely.
+## 🌍 Why agents love it
 
-Agents get **seven small tools** with validated inputs, an internal Overpass query planner, rate-limit guardrails, and **token-efficient** responses (`summary` + `data`)—not a catalog of 30+ APIs and not raw OverpassQL.
+OpenStreetMap is the world's largest **open** geodata commons—but agents break when they:
 
-## Why this exists
+- Write invalid **OverpassQL** (syntax errors, timeouts, huge downloads)
+- Choke on **raw OSM JSON** (thousands of tags per response)
+- Can't give users **clickable map links**
+- Pick the wrong tool from a **30+ tool** MCP buffet
 
-| Problem | How we solve it |
-|--------|------------------|
-| LLMs write broken **OverpassQL** | Queries are built from structured intents; agents never execute arbitrary QL |
-| **Huge** OSM MCP tool lists confuse models | Seven focused tools with clear descriptions |
-| Full OSM JSON **floods context** | Summarized places, trimmed tags, optional `distance_m` sorting |
-| Public APIs get **hammered** | Nominatim rate limit (~1 req/s), bbox caps, result limits, identifiable User-Agent |
+**osm-agent-query** fixes that with **9 focused tools**, an internal query planner, guardrails, and responses agents can actually use.
 
-## Architecture
+| | osm-agent-query | Typical OSM MCP |
+|--|-----------------|-----------------|
+| Tools | 9 + 3 workflow prompts | Often 20–30+ |
+| OverpassQL | Hidden (structured planner) | Often exposed |
+| User links | `map`, `osm`, `directions` on every POI | Rare |
+| POI extras | `phone`, `hours`, `website` highlights | Raw tags only |
+| Workflows | MCP prompts + resources | DIY |
+| Reliability | Nominatim cache, Overpass retry | Varies |
 
-```mermaid
-flowchart TB
-  subgraph agents [Agent hosts]
-    Cursor[Cursor]
-    Codex[Codex CLI]
-    Other[Cline / Windsurf / …]
-  end
+## ✨ Highlights (v0.3)
 
-  subgraph mcp [osm-agent-query MCP]
-    Tools[7 MCP tools]
-    Planner[Query planner]
-    Guard[Guardrails]
-    Summarize[Summarizer]
-  end
+- **Clickable links** on geocode, search, and route results (OpenStreetMap directions included)
+- **`compare_routes`** — foot + driving + cycling in one call
+- **`map_links`** — shareable URLs for any coordinate
+- **MCP resources** — `osm-agent://guide`, `osm-agent://categories`
+- **MCP prompts** — outing planner, amenity audit, commute comparison
+- **`format: compact | full`** on search tools
+- **Geocode cache** (5 min) + **Overpass retry** on transient errors
+- **27 POI categories** (pharmacy → subway → marketplace)
 
-  subgraph apis [Public OSM services]
-    Nominatim[Nominatim]
-    Overpass[Overpass API]
-    OSRM[OSRM]
-    Taginfo[Taginfo]
-  end
+## 🛠 Tools
 
-  agents --> Tools
-  Tools --> Guard
-  Guard --> Planner
-  Planner --> apis
-  apis --> Summarize
-  Summarize --> Tools
+| Tool | What you get |
+|------|----------------|
+| `geocode` | Coordinates, bbox, **map link** |
+| `reverse_geocode` | Address + map link |
+| `search_nearby` | POIs by category, **sorted by distance**, links & highlights |
+| `search_in_area` | POIs in a named place or bbox |
+| `route` | Distance, duration, polyline, **directions URL** |
+| `compare_routes` | Foot / drive / bike side-by-side + links |
+| `map_links` | Map, element, directions URLs for any point |
+| `explain_osm_tags` | Tag docs + category list |
+| `preview_query` | Debug Overpass plan (no network) |
+
+Every success response:
+
+```json
+{
+  "ok": true,
+  "summary": "Found 8 Cafe(s) within 600m.",
+  "data": { }
+}
 ```
 
-Deep dive: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-
-## Quick start
-
-**Requirements:** Node.js 20+
-
-### Run with npx (recommended)
+## 🚀 Quick start
 
 ```bash
-npx osm-agent-query@latest
+npx -y osm-agent-query@latest
 ```
 
-Add to **Cursor** (`.cursor/mcp.json` or Settings → MCP):
+**Cursor** — `.cursor/mcp.json`:
 
 ```json
 {
@@ -82,133 +102,118 @@ Add to **Cursor** (`.cursor/mcp.json` or Settings → MCP):
 }
 ```
 
-### From source
+Restart Cursor. Ask: *"Find cafes within 10 minutes walk of the Eiffel Tower and link me on OpenStreetMap."*
+
+**From source:**
 
 ```bash
 git clone https://github.com/diabmoh/osm-agent-query.git
-cd osm-agent-query
-npm install && npm run build
+cd osm-agent-query && npm install && npm run build
 node dist/index.js --version
 ```
 
-Local path config:
+## 📎 Prompts & resources
 
-```json
-{
-  "mcpServers": {
-    "osm-agent-query": {
-      "command": "node",
-      "args": ["/absolute/path/to/osm-agent-query/dist/index.js"]
-    }
-  }
-}
-```
+| MCP prompt | Use when |
+|------------|----------|
+| `plan_local_outing` | Geocode → nearby POIs → routes → links |
+| `neighborhood_amenity_audit` | Survey schools, pharmacies, parks in an area |
+| `commute_comparison` | Foot vs drive vs bike between two places |
 
-Restart the editor after changing MCP settings.
+| MCP resource | URI |
+|--------------|-----|
+| Agent skill (markdown) | `osm-agent://guide` |
+| Category catalog (JSON) | `osm-agent://categories` |
 
-## Tools
+Install the skill file for Codex: [skills/osm-agent-query/SKILL.md](skills/osm-agent-query/SKILL.md)
 
-| Tool | What it does |
-|------|----------------|
-| `geocode` | Place name or address → coordinates + bbox |
-| `reverse_geocode` | Coordinates → address / display name |
-| `search_nearby` | Category + lat/lon + radius → nearby POIs (sorted by distance) |
-| `search_in_area` | Category + place name or bbox → POIs in area |
-| `route` | A→B distance & duration (foot / driving / cycling) |
-| `explain_osm_tags` | Tag documentation + alternatives; or list categories |
-| `preview_query` | Debug: show planned Overpass query **without** executing |
+## 📦 Example output
 
-### Response shape
-
-Every successful tool returns:
+`search_nearby` near Paris (compact):
 
 ```json
 {
   "ok": true,
-  "summary": "Found 12 Pharmacy(s) within 800m.",
-  "data": { }
+  "summary": "Found 3 Cafe(s) within 600m.",
+  "data": {
+    "category": "Cafe",
+    "count": 3,
+    "places": [
+      {
+        "name": "Café de Flore",
+        "lat": 48.8542,
+        "lon": 2.3325,
+        "distance_m": 412,
+        "links": {
+          "map": "https://www.openstreetmap.org/?mlat=48.8542&mlon=2.3325#map=17/...",
+          "osm": "https://www.openstreetmap.org/node/123456",
+          "directions_from": "https://www.openstreetmap.org/directions?engine=..."
+        },
+        "highlights": {
+          "opening_hours": "Mo-Sa 07:00-23:00",
+          "website": "https://example.com"
+        }
+      }
+    ]
+  }
 }
 ```
 
-Errors return `{ "error": true, "code": "NOT_FOUND", "message": "..." }` with MCP `isError`.
+## 🗂 Categories
 
-### Example: coffee near a landmark
+`restaurant` · `cafe` · `pharmacy` · `supermarket` · `hospital` · `school` · `parking` · `ev_charging` · `hotel` · `bank` · `fuel` · `park` · `library` · `museum` · `dentist` · `bakery` · `atm` · `post_office` · `bar` · `cinema` · `bus_stop` · `subway` · `police` · `fire_station` · `veterinary` · `marketplace`
 
-1. **`geocode`** — `{ "query": "Eiffel Tower, Paris", "limit": 1 }`  
-2. **`search_nearby`** — `{ "category": "cafe", "lat": 48.858, "lon": 2.294, "radius_m": 600 }`  
-3. **`route`** — `{ "from_lat": 48.858, "from_lon": 2.294, "to_lat": 48.860, "to_lon": 2.337, "profile": "foot" }`
+Custom: `{ "category": "custom", "tag_key": "amenity", "tag_value": "bicycle_rental" }`
 
-### Search categories
+## ⚙️ Configuration
 
-`restaurant`, `cafe`, `pharmacy`, `supermarket`, `hospital`, `school`, `parking`, `ev_charging`, `hotel`, `bank`, `fuel`, `park`, `library`, `museum`, `dentist`, `bakery`, `atm`, `post_office`, `bar`, `cinema`
+| Variable | Default |
+|----------|---------|
+| `OSM_USER_AGENT` | Identifies your app ([required by Nominatim](https://operations.osmfoundation.org/policies/nominatim/)) |
+| `NOMINATIM_URL` | Public Nominatim |
+| `OVERPASS_URL` | overpass-api.de |
+| `OSRM_URL` | router.project-osrm.org |
+| `TAGINFO_URL` | taginfo.openstreetmap.org |
 
-Custom tags: `{ "category": "custom", "tag_key": "amenity", "tag_value": "bicycle_rental" }`
+High volume? Self-host and point env vars at your stack.
 
-## Comparison
-
-| | **osm-agent-query** | Typical OSM MCP servers |
-|--|---------------------|-------------------------|
-| Tool count | 7, composable | Often 20–30+ |
-| OverpassQL | Internal only | Often exposed to the model |
-| Responses | `summary` + trimmed `data` | Often raw OSM JSON |
-| Agent skill | Shipped in `skills/` | Rare |
-| Eval harness | 16 tasks, CI dry-run | Rare |
-
-## Agent skill
-
-Install [skills/osm-agent-query/SKILL.md](skills/osm-agent-query/SKILL.md) so your agent knows when to prefer OSM over web search and how to chain tools without inventing OverpassQL.
-
-## Configuration
-
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `OSM_USER_AGENT` | `osm-agent-query/0.2.0 (…)` | **Required** by [Nominatim policy](https://operations.osmfoundation.org/policies/nominatim/) |
-| `NOMINATIM_URL` | `https://nominatim.openstreetmap.org` | Geocoding |
-| `OVERPASS_URL` | `https://overpass-api.de/api/interpreter` | POI search |
-| `OSRM_URL` | `https://router.project-osrm.org` | Routing |
-| `TAGINFO_URL` | `https://taginfo.openstreetmap.org/api/4` | Tag docs |
-
-For production or high volume, **self-host** Nominatim and Overpass and point these variables at your instances.
-
-## Development
+## 🧪 Development
 
 ```bash
-npm install
-npm run build      # compile TypeScript
-npm test           # unit tests
-npm run eval:dry   # eval harness (no Overpass/OSRM)
-npm run eval       # live eval (respect rate limits)
+npm install && npm run build
+npm test              # 15+ unit tests
+npm run eval:dry      # CI-safe regression tasks
+npm run eval          # Live APIs (be gentle)
 ```
 
-## Project layout
+## ❓ FAQ
 
-```
-src/
-  tools/          # MCP tool handlers
-  planner/        # Structured → Overpass QL
-  ontology/       # Category → OSM tags
-  guardrails/     # Limits & Nominatim rate limit
-  clients/        # HTTP adapters
-  summarize/      # Token-efficient output
-eval/             # Agent task regression set
-skills/           # Agent skill for Codex/Cursor
-examples/         # MCP config snippets
-```
+**Why not expose OverpassQL?**  
+Models generate invalid or expensive queries. We compile from validated intents—see [Text-to-OverpassQL](https://aclanthology.org/2024.tacl-1.31.pdf).
 
-## Roadmap
+**Can agents edit the map?**  
+Not in v0.3 (read-only by design). Editing needs OAuth and changeset review.
 
-- [ ] Optional `geometry: "none"` on routes for smaller payloads
-- [ ] Cached Taginfo ontology refresh script
-- [ ] MCP resources for static category/tag docs
+**Is public Nominatim OK for production?**  
+Fine for demos and agent sessions. Production apps should self-host.
 
-## Contributing
+**How is this different from [osm-mcp](https://github.com/GRABOSM/osm-mcp)?**  
+We optimize for **agent UX**: fewer tools, summaries, links, prompts, guardrails—not maximum API surface.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Bug reports and PRs welcome.
+## 🗺 Roadmap
 
-## License
+- [ ] `search_open_now` using `opening_hours` evaluation
+- [ ] Optional route geometry stripping for token savings
+- [ ] npm publish + MCP registry listing
 
-[Apache-2.0](LICENSE)
+## 🤝 Contributing
 
-## Acknowledgments
+[CONTRIBUTING.md](CONTRIBUTING.md) — PRs welcome.
 
-Built on open data and services from the [OpenStreetMap Foundation](https://osmfoundation.org/) and contributors worldwide. Please use responsibly.
+## 📄 License
+
+Apache-2.0 · Data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright)
+
+<p align="center">
+  <sub>Built for Codex, Cursor, Cline, and every MCP host that talks to the real world.</sub>
+</p>

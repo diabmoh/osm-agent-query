@@ -108,6 +108,36 @@ export const CATEGORY_MAP: Record<string, CategorySpec> = {
     tags: [{ amenity: "cinema" }],
     description: "Movie theaters",
   },
+  bus_stop: {
+    label: "Bus stop",
+    tags: [{ highway: "bus_stop" }, { public_transport: "platform" }],
+    description: "Public transport stops",
+  },
+  subway: {
+    label: "Subway station",
+    tags: [{ railway: "station" }, { station: "subway" }],
+    description: "Metro / subway stations",
+  },
+  police: {
+    label: "Police",
+    tags: [{ amenity: "police" }],
+    description: "Police stations",
+  },
+  fire_station: {
+    label: "Fire station",
+    tags: [{ amenity: "fire_station" }],
+    description: "Fire and rescue",
+  },
+  veterinary: {
+    label: "Veterinary",
+    tags: [{ amenity: "veterinary" }],
+    description: "Vet clinics",
+  },
+  marketplace: {
+    label: "Marketplace",
+    tags: [{ amenity: "marketplace" }, { shop: "mall" }],
+    description: "Markets and malls",
+  },
 };
 
 export function resolveCategory(category: string): CategorySpec {

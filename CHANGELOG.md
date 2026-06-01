@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.0] - 2026-06-01
+
+### Added
+
+- `map_links` and `compare_routes` tools
+- OpenStreetMap URLs on geocode, search, and route results (`links`, `highlights`)
+- MCP resources: `osm-agent://guide`, `osm-agent://categories`
+- MCP prompts: `plan_local_outing`, `neighborhood_amenity_audit`, `commute_comparison`
+- `format: compact | full` on search tools
+- Geocode response cache (5 min) and Overpass retry on 5xx/429
+- Seven more categories; `docs/USE_CASES.md` and README banner
+
+### Changed
+
+- Search results include phone, hours, website in `highlights` when tagged in OSM
+- Version 0.3.0
+
 ## [0.2.0] - 2026-06-01
 
 ### Added

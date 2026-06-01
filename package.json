@@ -1,6 +1,6 @@
 {
   "name": "osm-agent-query",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Structured OpenStreetMap access for AI coding agents via MCP",
   "type": "module",
   "main": "dist/index.js",

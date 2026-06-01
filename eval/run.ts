@@ -8,6 +8,8 @@ import { handleSearchInArea } from "../src/tools/search-in-area.js";
 import { handleRoute } from "../src/tools/route.js";
 import { handleExplainTags } from "../src/tools/explain-tags.js";
 import { handlePreviewQuery } from "../src/tools/preview-query.js";
+import { handleMapLinks } from "../src/tools/map-links.js";
+import { handleCompareRoutes } from "../src/tools/compare-routes.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dryRun = process.argv.includes("--dry-run");
@@ -35,6 +37,9 @@ const handlers: Record<
     handleExplainTags(a as Parameters<typeof handleExplainTags>[0]),
   preview_query: (a) =>
     handlePreviewQuery(a as Parameters<typeof handlePreviewQuery>[0]),
+  map_links: (a) => handleMapLinks(a as Parameters<typeof handleMapLinks>[0]),
+  compare_routes: (a) =>
+    handleCompareRoutes(a as Parameters<typeof handleCompareRoutes>[0]),
 };
 
 function checkExpect(
@@ -61,6 +66,14 @@ function checkExpect(
   }
   if (expect.has_overpass_preview) {
     return typeof data.overpass_preview === "string";
+  }
+  if (expect.has_map_link) {
+    const links = data.links as { map?: string } | undefined;
+    return typeof links?.map === "string" && links.map.includes("openstreetmap");
+  }
+  if (expect.options_min) {
+    const options = data.options as unknown[] | undefined;
+    return (options?.length ?? 0) >= (expect.options_min as number);
   }
   return true;
 }

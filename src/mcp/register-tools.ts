@@ -26,6 +26,11 @@ import {
   previewQuerySchema,
   handlePreviewQuery,
 } from "../tools/preview-query.js";
+import { mapLinksSchema, handleMapLinks } from "../tools/map-links.js";
+import {
+  compareRoutesSchema,
+  handleCompareRoutes,
+} from "../tools/compare-routes.js";
 
 async function runTool<T>(
   handler: () => Promise<T>,
@@ -118,5 +123,26 @@ export function registerOsmTools(server: McpServer): void {
     },
     async (args) =>
       runTool(() => handlePreviewQuery(previewQuerySchema.parse(args))),
+  );
+
+  server.registerTool(
+    "map_links",
+    {
+      description:
+        "Generate OpenStreetMap URLs for a coordinate: map view, element page, and optional walking/driving directions from another point. Share links with end users.",
+      inputSchema: mapLinksSchema.shape,
+    },
+    async (args) => runTool(() => handleMapLinks(mapLinksSchema.parse(args))),
+  );
+
+  server.registerTool(
+    "compare_routes",
+    {
+      description:
+        "Compare foot, driving, and cycling routes between two points in one call. Includes OSM directions links for each mode.",
+      inputSchema: compareRoutesSchema.shape,
+    },
+    async (args) =>
+      runTool(() => handleCompareRoutes(compareRoutesSchema.parse(args))),
   );
 }
