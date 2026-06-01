@@ -1,0 +1,150 @@
+{
+  "version": "1",
+  "tasks": [
+    {
+      "id": "geocode-paris",
+      "tool": "geocode",
+      "args": { "query": "Eiffel Tower, Paris", "limit": 1 },
+      "expect": { "results_min": 1 }
+    },
+    {
+      "id": "reverse-paris",
+      "tool": "reverse_geocode",
+      "args": { "lat": 48.8584, "lon": 2.2945 },
+      "expect": { "has_display_name": true }
+    },
+    {
+      "id": "nearby-pharmacy",
+      "tool": "search_nearby",
+      "args": {
+        "category": "pharmacy",
+        "lat": 48.8584,
+        "lon": 2.2945,
+        "radius_m": 1000,
+        "limit": 5
+      },
+      "expect": { "mock": true }
+    },
+    {
+      "id": "area-supermarket",
+      "tool": "search_in_area",
+      "args": {
+        "category": "supermarket",
+        "south": 40.7,
+        "west": -74.02,
+        "north": 40.75,
+        "east": -73.95,
+        "limit": 5
+      },
+      "expect": { "mock": true }
+    },
+    {
+      "id": "route-walk",
+      "tool": "route",
+      "args": {
+        "from_lat": 48.8584,
+        "from_lon": 2.2945,
+        "to_lat": 48.8606,
+        "to_lon": 2.3376,
+        "profile": "foot"
+      },
+      "expect": { "mock": true }
+    },
+    {
+      "id": "tags-restaurant",
+      "tool": "explain_osm_tags",
+      "args": { "tag_key": "amenity", "tag_value": "restaurant" },
+      "expect": { "has_description": true }
+    },
+    {
+      "id": "list-categories",
+      "tool": "explain_osm_tags",
+      "args": { "tag_key": "amenity", "list_categories": true },
+      "expect": { "categories_min": 5 }
+    },
+    {
+      "id": "nearby-cafe",
+      "tool": "search_nearby",
+      "args": {
+        "category": "cafe",
+        "lat": 35.6762,
+        "lon": 139.6503,
+        "radius_m": 600,
+        "limit": 3
+      },
+      "expect": { "mock": true }
+    },
+    {
+      "id": "nearby-ev",
+      "tool": "search_nearby",
+      "args": {
+        "category": "ev_charging",
+        "lat": 37.7749,
+        "lon": -122.4194,
+        "radius_m": 2000,
+        "limit": 5
+      },
+      "expect": { "mock": true }
+    },
+    {
+      "id": "geocode-brooklyn",
+      "tool": "geocode",
+      "args": { "query": "Brooklyn, New York", "limit": 1 },
+      "expect": { "results_min": 1 }
+    },
+    {
+      "id": "area-place",
+      "tool": "search_in_area",
+      "args": {
+        "category": "hospital",
+        "place": "Geneva, Switzerland",
+        "limit": 3
+      },
+      "expect": { "mock": true }
+    },
+    {
+      "id": "route-drive",
+      "tool": "route",
+      "args": {
+        "from_lat": 40.758,
+        "from_lon": -73.9855,
+        "to_lat": 40.7484,
+        "to_lon": -73.9857,
+        "profile": "driving"
+      },
+      "expect": { "mock": true }
+    },
+    {
+      "id": "tags-cafe-alt",
+      "tool": "explain_osm_tags",
+      "args": { "tag_key": "amenity", "tag_value": "cafe" },
+      "expect": { "has_description": true }
+    },
+    {
+      "id": "nearby-park",
+      "tool": "search_nearby",
+      "args": {
+        "category": "park",
+        "lat": 51.5074,
+        "lon": -0.1278,
+        "radius_m": 1500,
+        "limit": 5
+      },
+      "expect": { "mock": true }
+    },
+    {
+      "id": "custom-tag",
+      "tool": "search_nearby",
+      "args": {
+        "category": "custom",
+        "tag_key": "amenity",
+        "tag_value": "library",
+        "lat": 52.52,
+        "lon": 13.405,
+        "radius_m": 2000,
+        "limit": 5
+      },
+      "expect": { "mock": true }
+    }
+  ]
+}
