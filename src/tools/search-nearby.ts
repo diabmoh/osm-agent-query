@@ -10,13 +10,14 @@ import {
 } from "../ontology/tags.js";
 import { intentFromBbox } from "../planner/overpass.js";
 import { executeSearchIntent } from "../clients/overpass.js";
+import { toolSuccess } from "../mcp/response.js";
 import { summarizeSearch } from "../summarize/results.js";
 
 export const searchNearbySchema = z.object({
   category: z
     .string()
     .describe(
-      "Category: restaurant, cafe, pharmacy, supermarket, hospital, school, parking, ev_charging, hotel, bank, fuel, park",
+      "Category: restaurant, cafe, pharmacy, supermarket, hospital, school, parking, ev_charging, hotel, bank, fuel, park, library, museum, dentist, bakery, atm, post_office, bar, cinema",
     ),
   lat: z.number(),
   lon: z.number(),
@@ -52,5 +53,12 @@ export async function handleSearchNearby(
 
   const intent = intentFromBbox(bbox, tagFilters, limit);
   const data = await executeSearchIntent(intent);
-  return summarizeSearch(data.elements, label);
+  const summary = summarizeSearch(data.elements, label, {
+    centerLat: args.lat,
+    centerLon: args.lon,
+  });
+  return toolSuccess(
+    `Found ${summary.count} ${label}(s) within ${args.radius_m}m.`,
+    summary,
+  );
 }

@@ -7,6 +7,7 @@ import { handleSearchNearby } from "../src/tools/search-nearby.js";
 import { handleSearchInArea } from "../src/tools/search-in-area.js";
 import { handleRoute } from "../src/tools/route.js";
 import { handleExplainTags } from "../src/tools/explain-tags.js";
+import { handlePreviewQuery } from "../src/tools/preview-query.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dryRun = process.argv.includes("--dry-run");
@@ -18,7 +19,10 @@ type Task = {
   expect: Record<string, unknown>;
 };
 
-const handlers: Record<string, (args: Record<string, unknown>) => Promise<unknown>> = {
+const handlers: Record<
+  string,
+  (args: Record<string, unknown>) => Promise<{ ok: boolean; data?: unknown }>
+> = {
   geocode: (a) => handleGeocode(a as Parameters<typeof handleGeocode>[0]),
   reverse_geocode: (a) =>
     handleReverseGeocode(a as Parameters<typeof handleReverseGeocode>[0]),
@@ -29,18 +33,34 @@ const handlers: Record<string, (args: Record<string, unknown>) => Promise<unknow
   route: (a) => handleRoute(a as Parameters<typeof handleRoute>[0]),
   explain_osm_tags: (a) =>
     handleExplainTags(a as Parameters<typeof handleExplainTags>[0]),
+  preview_query: (a) =>
+    handlePreviewQuery(a as Parameters<typeof handlePreviewQuery>[0]),
 };
 
-function checkExpect(result: unknown, expect: Record<string, unknown>): boolean {
+function checkExpect(
+  result: { ok: boolean; data?: unknown },
+  expect: Record<string, unknown>,
+): boolean {
   if (expect.mock && dryRun) return true;
-  const r = result as Record<string, unknown>;
-  if (expect.results_min && Array.isArray(r.results)) {
-    return r.results.length >= (expect.results_min as number);
+  if (!result.ok) return false;
+  const data = result.data as Record<string, unknown>;
+
+  if (expect.results_min) {
+    const results = data.results as unknown[] | undefined;
+    return (results?.length ?? 0) >= (expect.results_min as number);
   }
-  if (expect.has_display_name) return typeof r.display_name === "string";
-  if (expect.has_description) return typeof r.description === "string";
-  if (expect.categories_min && Array.isArray(r.categories)) {
-    return r.categories.length >= (expect.categories_min as number);
+  if (expect.has_display_name) {
+    return typeof data.display_name === "string";
+  }
+  if (expect.has_description) {
+    return typeof data.description === "string";
+  }
+  if (expect.categories_min) {
+    const categories = data.categories as unknown[] | undefined;
+    return (categories?.length ?? 0) >= (expect.categories_min as number);
+  }
+  if (expect.has_overpass_preview) {
+    return typeof data.overpass_preview === "string";
   }
   return true;
 }
@@ -51,7 +71,6 @@ async function run() {
   ).tasks;
 
   let passed = 0;
-  let skipped = 0;
 
   for (const task of tasks) {
     const handler = handlers[task.tool];
@@ -61,7 +80,6 @@ async function run() {
     }
     if (dryRun && task.expect.mock) {
       console.log(`SKIP (dry-run) ${task.id}`);
-      skipped++;
       passed++;
       continue;
     }
@@ -78,7 +96,7 @@ async function run() {
     }
   }
 
-  console.log(`\n${passed}/${tasks.length} passed (${skipped} skipped in dry-run)`);
+  console.log(`\n${passed}/${tasks.length} passed`);
   if (passed < tasks.length) process.exit(1);
 }
 

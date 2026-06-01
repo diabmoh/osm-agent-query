@@ -1,8 +1,6 @@
 # Codex CLI integration
 
-## MCP server
-
-Add to your Codex MCP configuration (path may vary by install):
+## MCP configuration
 
 ```json
 {
@@ -15,26 +13,25 @@ Add to your Codex MCP configuration (path may vary by install):
 }
 ```
 
-## Example workflows
+## Example: evening plans near a landmark
 
-### Travel planning
+**User:** “Find cafes within 10 minutes walk of the Eiffel Tower.”
 
-1. `geocode` — "Shibuya Station, Tokyo"
-2. `search_nearby` — category `hotel`, radius 1500m
-3. `route` — hotel → landmark, profile `foot`
+**Agent steps:**
 
-### Local business lookup
+1. `geocode` → `{ "query": "Tour Eiffel, Paris" }`  
+   Read `data.results[0].lat` / `lon` from the response.
 
-1. `geocode` — neighborhood or address
-2. `search_nearby` — category `pharmacy` or `supermarket`
-3. Present results with names and distances; note OSM may be incomplete
+2. `search_nearby` → `{ "category": "cafe", "lat": …, "lon": …, "radius_m": 800 }`  
+   Tell the user the `summary` and top entries from `data.places` (use `distance_m`).
 
-### Urban analysis
+3. Optionally `route` to one cafe for exact walk time.
 
-1. `search_in_area` — category `park`, place "Brooklyn, New York"
-2. `explain_osm_tags` — `amenity=parking` alternatives
-3. Summarize counts and gaps in coverage
+## Example: neighborhood amenities
+
+1. `search_in_area` → `{ "category": "pharmacy", "place": "Brooklyn, New York", "limit": 10 }`
+2. Report `summary` and list named pharmacies from `data.places`.
 
 ## Skill
 
-Install the agent skill from `skills/osm-agent-query/SKILL.md` so Codex chains tools correctly and respects OSM usage policy.
+Install `skills/osm-agent-query/SKILL.md` in your agent skills path.

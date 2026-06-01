@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { validateCoordinates } from "../guardrails/limits.js";
 import * as osrm from "../clients/osrm.js";
+import { toolSuccess } from "../mcp/response.js";
 
 export const routeSchema = z.object({
   from_lat: z.number(),
@@ -22,12 +23,15 @@ export async function handleRoute(args: z.infer<typeof routeSchema>) {
     args.profile,
   );
   const minutes = Math.round(route.duration_s / 60);
-  return {
+  const data = {
     profile: route.profile,
     distance_m: route.distance_m,
     duration_s: route.duration_s,
     duration_human: `${minutes} min`,
-    note: "Geometry returned as encoded polyline; decode if you need a map path.",
     geometry_encoded: route.geometry_encoded,
   };
+  return toolSuccess(
+    `${args.profile} route: ${route.distance_m} m, ~${minutes} min.`,
+    data,
+  );
 }

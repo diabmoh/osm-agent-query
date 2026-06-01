@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { OsmAgentError } from "../errors.js";
 import {
   clampLimit,
   validateBbox,
@@ -11,6 +12,7 @@ import {
 } from "../ontology/tags.js";
 import { intentFromBbox } from "../planner/overpass.js";
 import { executeSearchIntent } from "../clients/overpass.js";
+import { toolSuccess } from "../mcp/response.js";
 import { summarizeSearch } from "../summarize/results.js";
 
 export const searchInAreaSchema = z.object({
@@ -30,9 +32,13 @@ export const searchInAreaSchema = z.object({
 
 async function bboxFromPlace(place: string): Promise<Bbox> {
   const results = await nominatim.geocodeQuery(place, 1);
-  if (!results.length) throw new Error(`Place not found: ${place}`);
+  if (!results.length) {
+    throw new OsmAgentError(`Place not found: ${place}`, "NOT_FOUND");
+  }
   const bb = nominatim.bboxFromNominatim(results[0]);
-  if (!bb) throw new Error(`No bounding box for place: ${place}`);
+  if (!bb) {
+    throw new OsmAgentError(`No bounding box for place: ${place}`, "NOT_FOUND");
+  }
   validateBbox(bb);
   return bb;
 }
@@ -43,8 +49,10 @@ export async function handleSearchInArea(
   const limit = clampLimit(args.limit);
 
   let bbox: Bbox;
+  let areaLabel: string;
   if (args.place) {
     bbox = await bboxFromPlace(args.place);
+    areaLabel = args.place;
   } else if (
     args.south !== undefined &&
     args.west !== undefined &&
@@ -58,6 +66,7 @@ export async function handleSearchInArea(
       east: args.east,
     };
     validateBbox(bbox);
+    areaLabel = "custom bbox";
   } else {
     throw new Error("Provide either place name or south/west/north/east bbox");
   }
@@ -77,5 +86,9 @@ export async function handleSearchInArea(
 
   const intent = intentFromBbox(bbox, tagFilters, limit);
   const data = await executeSearchIntent(intent);
-  return summarizeSearch(data.elements, label);
+  const summary = summarizeSearch(data.elements, label);
+  return toolSuccess(
+    `Found ${summary.count} ${label}(s) in ${areaLabel}.`,
+    summary,
+  );
 }

@@ -145,6 +145,18 @@
         "limit": 5
       },
       "expect": { "mock": true }
+    },
+    {
+      "id": "preview-cafe",
+      "tool": "preview_query",
+      "args": {
+        "category": "cafe",
+        "lat": 48.8584,
+        "lon": 2.2945,
+        "radius_m": 500,
+        "limit": 5
+      },
+      "expect": { "has_overpass_preview": true }
     }
   ]
 }

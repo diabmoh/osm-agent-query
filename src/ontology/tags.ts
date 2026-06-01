@@ -68,6 +68,46 @@ export const CATEGORY_MAP: Record<string, CategorySpec> = {
     tags: [{ leisure: "park" }],
     description: "Parks and green spaces",
   },
+  library: {
+    label: "Library",
+    tags: [{ amenity: "library" }],
+    description: "Public libraries",
+  },
+  museum: {
+    label: "Museum",
+    tags: [{ tourism: "museum" }],
+    description: "Museums and galleries",
+  },
+  dentist: {
+    label: "Dentist",
+    tags: [{ amenity: "dentist" }],
+    description: "Dental clinics",
+  },
+  bakery: {
+    label: "Bakery",
+    tags: [{ shop: "bakery" }],
+    description: "Bakeries",
+  },
+  atm: {
+    label: "ATM",
+    tags: [{ amenity: "atm" }],
+    description: "Cash machines",
+  },
+  post_office: {
+    label: "Post office",
+    tags: [{ amenity: "post_office" }],
+    description: "Postal services",
+  },
+  bar: {
+    label: "Bar",
+    tags: [{ amenity: "bar" }, { amenity: "pub" }],
+    description: "Bars and pubs",
+  },
+  cinema: {
+    label: "Cinema",
+    tags: [{ amenity: "cinema" }],
+    description: "Movie theaters",
+  },
 };
 
 export function resolveCategory(category: string): CategorySpec {

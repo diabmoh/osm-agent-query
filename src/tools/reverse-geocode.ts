@@ -1,5 +1,6 @@
 import { z } from "zod";
 import * as nominatim from "../clients/nominatim.js";
+import { toolSuccess } from "../mcp/response.js";
 import { summarizeReverse } from "../summarize/results.js";
 
 export const reverseGeocodeSchema = z.object({
@@ -11,5 +12,6 @@ export async function handleReverseGeocode(
   args: z.infer<typeof reverseGeocodeSchema>,
 ) {
   const result = await nominatim.reverseGeocode(args.lat, args.lon);
-  return summarizeReverse(result);
+  const data = summarizeReverse(result);
+  return toolSuccess(`Location: ${data.display_name}`, data);
 }

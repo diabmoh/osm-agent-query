@@ -1,14 +1,17 @@
 import type { OverpassElement } from "../clients/overpass.js";
 import type { NominatimResult } from "../clients/nominatim.js";
+import { haversineM } from "../geo/haversine.js";
+
+const MAX_TAGS_PER_PLACE = 8;
 
 export type PlaceSummary = {
   name: string;
   lat: number;
   lon: number;
+  distance_m?: number;
   osm_id?: number;
   osm_type?: string;
   tags?: Record<string, string>;
-  address_hint?: string;
 };
 
 export type GeocodeSummary = {
@@ -21,6 +24,11 @@ export type GeocodeSummary = {
     type?: string;
   }>;
 };
+
+function trimTags(tags: Record<string, string>): Record<string, string> {
+  const keys = Object.keys(tags).slice(0, MAX_TAGS_PER_PLACE);
+  return Object.fromEntries(keys.map((k) => [k, tags[k]]));
+}
 
 export function summarizeGeocode(
   query: string,
@@ -70,6 +78,7 @@ export function summarizeReverse(r: NominatimResult): {
 export function summarizeSearch(
   elements: OverpassElement[],
   categoryLabel: string,
+  opts?: { centerLat?: number; centerLon?: number },
 ): { category: string; count: number; places: PlaceSummary[] } {
   const places: PlaceSummary[] = [];
   for (const el of elements) {
@@ -83,15 +92,37 @@ export function summarizeSearch(
       tags.amenity ??
       tags.shop ??
       `${el.type}/${el.id}`;
-    places.push({
+
+    const place: PlaceSummary = {
       name,
       lat,
       lon,
       osm_id: el.id,
       osm_type: el.type,
-      tags: Object.keys(tags).length ? tags : undefined,
-    });
+    };
+
+    if (opts?.centerLat !== undefined && opts?.centerLon !== undefined) {
+      place.distance_m = haversineM(
+        opts.centerLat,
+        opts.centerLon,
+        lat,
+        lon,
+      );
+    }
+
+    if (Object.keys(tags).length) {
+      place.tags = trimTags(tags);
+    }
+
+    places.push(place);
   }
+
+  if (places.some((p) => p.distance_m !== undefined)) {
+    places.sort(
+      (a, b) => (a.distance_m ?? Infinity) - (b.distance_m ?? Infinity),
+    );
+  }
+
   return {
     category: categoryLabel,
     count: places.length,

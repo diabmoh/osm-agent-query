@@ -1,5 +1,7 @@
 import { z } from "zod";
+import { OsmAgentError } from "../errors.js";
 import * as nominatim from "../clients/nominatim.js";
+import { toolSuccess } from "../mcp/response.js";
 import { summarizeGeocode } from "../summarize/results.js";
 
 export const geocodeSchema = z.object({
@@ -10,7 +12,12 @@ export const geocodeSchema = z.object({
 export async function handleGeocode(args: z.infer<typeof geocodeSchema>) {
   const results = await nominatim.geocodeQuery(args.query, args.limit);
   if (!results.length) {
-    return { error: "No results found", query: args.query };
+    throw new OsmAgentError(`No results for: ${args.query}`, "NOT_FOUND");
   }
-  return summarizeGeocode(args.query, results);
+  const data = summarizeGeocode(args.query, results);
+  const top = data.results[0];
+  return toolSuccess(
+    `Found ${data.results.length} result(s); best match: ${top.name} (${top.lat.toFixed(5)}, ${top.lon.toFixed(5)}).`,
+    data,
+  );
 }
