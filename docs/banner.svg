@@ -9,5 +9,5 @@
   <circle cx="72" cy="60" r="36" fill="url(#g)" opacity="0.9"/>
   <path d="M52 72 L72 38 L92 72 Z" fill="#0f172a" opacity="0.25"/>
   <text x="130" y="52" font-family="system-ui, sans-serif" font-size="28" font-weight="700" fill="#f8fafc">osm-agent-query</text>
-  <text x="130" y="82" font-family="system-ui, sans-serif" font-size="15" fill="#94a3b8">OpenStreetMap for AI agents ï¿½ MCP</text>
+  <text x="130" y="82" font-family="system-ui, sans-serif" font-size="15" fill="#94a3b8">OpenStreetMap for AI agents · MCP</text>
 </svg>
