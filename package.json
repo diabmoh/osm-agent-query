@@ -1,6 +1,6 @@
 {
   "name": "osm-agent-query",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Structured OpenStreetMap access for AI coding agents via MCP",
   "type": "module",
   "main": "dist/index.js",
@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
+    "opening_hours": "^3.11.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
@@ -48,6 +49,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/osm-agent-query.git"
-  }
+    "url": "https://github.com/diabmoh/osm-agent-query.git"
+  },
+  "homepage": "https://github.com/diabmoh/osm-agent-query#readme",
+  "bugs": {
+    "url": "https://github.com/diabmoh/osm-agent-query/issues"
+  },
+  "author": "diabmoh"
 }

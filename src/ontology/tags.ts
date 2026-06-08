@@ -68,6 +68,76 @@ export const CATEGORY_MAP: Record<string, CategorySpec> = {
     tags: [{ leisure: "park" }],
     description: "Parks and green spaces",
   },
+  library: {
+    label: "Library",
+    tags: [{ amenity: "library" }],
+    description: "Public libraries",
+  },
+  museum: {
+    label: "Museum",
+    tags: [{ tourism: "museum" }],
+    description: "Museums and galleries",
+  },
+  dentist: {
+    label: "Dentist",
+    tags: [{ amenity: "dentist" }],
+    description: "Dental clinics",
+  },
+  bakery: {
+    label: "Bakery",
+    tags: [{ shop: "bakery" }],
+    description: "Bakeries",
+  },
+  atm: {
+    label: "ATM",
+    tags: [{ amenity: "atm" }],
+    description: "Cash machines",
+  },
+  post_office: {
+    label: "Post office",
+    tags: [{ amenity: "post_office" }],
+    description: "Postal services",
+  },
+  bar: {
+    label: "Bar",
+    tags: [{ amenity: "bar" }, { amenity: "pub" }],
+    description: "Bars and pubs",
+  },
+  cinema: {
+    label: "Cinema",
+    tags: [{ amenity: "cinema" }],
+    description: "Movie theaters",
+  },
+  bus_stop: {
+    label: "Bus stop",
+    tags: [{ highway: "bus_stop" }, { public_transport: "platform" }],
+    description: "Public transport stops",
+  },
+  subway: {
+    label: "Subway station",
+    tags: [{ railway: "station" }, { station: "subway" }],
+    description: "Metro / subway stations",
+  },
+  police: {
+    label: "Police",
+    tags: [{ amenity: "police" }],
+    description: "Police stations",
+  },
+  fire_station: {
+    label: "Fire station",
+    tags: [{ amenity: "fire_station" }],
+    description: "Fire and rescue",
+  },
+  veterinary: {
+    label: "Veterinary",
+    tags: [{ amenity: "veterinary" }],
+    description: "Vet clinics",
+  },
+  marketplace: {
+    label: "Marketplace",
+    tags: [{ amenity: "marketplace" }, { shop: "mall" }],
+    description: "Markets and malls",
+  },
 };
 
 export function resolveCategory(category: string): CategorySpec {
