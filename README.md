@@ -17,18 +17,18 @@
 </p>
 
 <p align="center">
-  <a href="#-why-agents-love-it">Why</a> ·
-  <a href="#-tools">Tools</a> ·
-  <a href="#-quick-start">Quick start</a> ·
-  <a href="#-prompts--resources">Prompts</a> ·
-  <a href="#-example-output">Example</a> ·
+  <a href="#why-agents-love-it">Why</a> ·
+  <a href="#tools">Tools</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#prompts--resources">Prompts</a> ·
+  <a href="#example-output">Example</a> ·
   <a href="docs/USE_CASES.md">Use cases</a> ·
   <a href="docs/ARCHITECTURE.md">Architecture</a>
 </p>
 
 ---
 
-## 🌍 Why agents love it
+## Why agents love it
 
 OpenStreetMap is the world's largest **open** geodata commons—but agents break when they:
 
@@ -49,7 +49,7 @@ OpenStreetMap is the world's largest **open** geodata commons—but agents break
 | Workflows | MCP prompts + resources | DIY |
 | Reliability | Nominatim cache, Overpass retry | Varies |
 
-## ✨ Highlights (v0.3)
+## Highlights (v0.3)
 
 - **Clickable links** on geocode, search, and route results (OpenStreetMap directions included)
 - **`compare_routes`** — foot + driving + cycling in one call
@@ -60,7 +60,7 @@ OpenStreetMap is the world's largest **open** geodata commons—but agents break
 - **Geocode cache** (5 min) + **Overpass retry** on transient errors
 - **27 POI categories** (pharmacy → subway → marketplace)
 
-## 🛠 Tools
+## Tools
 
 | Tool | What you get |
 |------|----------------|
@@ -85,7 +85,7 @@ Every success response:
 }
 ```
 
-## 🚀 Quick start
+## Quick start
 
 ```bash
 npx -y osm-agent-query@latest
@@ -114,7 +114,7 @@ cd osm-agent-query && npm install && npm run build
 node dist/index.js --version
 ```
 
-## 📎 Prompts & resources
+## Prompts & resources
 
 | MCP prompt | Use when |
 |------------|----------|
@@ -129,7 +129,7 @@ node dist/index.js --version
 
 Install the skill file for Codex: [skills/osm-agent-query/SKILL.md](skills/osm-agent-query/SKILL.md)
 
-## 📦 Example output
+## Example output
 
 `search_nearby` near Paris (compact):
 
@@ -161,13 +161,13 @@ Install the skill file for Codex: [skills/osm-agent-query/SKILL.md](skills/osm-a
 }
 ```
 
-## 🗂 Categories
+## Categories
 
 `restaurant` · `cafe` · `pharmacy` · `supermarket` · `hospital` · `school` · `parking` · `ev_charging` · `hotel` · `bank` · `fuel` · `park` · `library` · `museum` · `dentist` · `bakery` · `atm` · `post_office` · `bar` · `cinema` · `bus_stop` · `subway` · `police` · `fire_station` · `veterinary` · `marketplace`
 
 Custom: `{ "category": "custom", "tag_key": "amenity", "tag_value": "bicycle_rental" }`
 
-## ⚙️ Configuration
+## Configuration
 
 | Variable | Default |
 |----------|---------|
@@ -179,7 +179,7 @@ Custom: `{ "category": "custom", "tag_key": "amenity", "tag_value": "bicycle_ren
 
 High volume? Self-host and point env vars at your stack.
 
-## 🧪 Development
+## Development
 
 ```bash
 npm install && npm run build
@@ -188,7 +188,7 @@ npm run eval:dry      # CI-safe regression tasks
 npm run eval          # Live APIs (be gentle)
 ```
 
-## ❓ FAQ
+## FAQ
 
 **Why not expose OverpassQL?**  
 Models generate invalid or expensive queries. We compile from validated intents—see [Text-to-OverpassQL](https://aclanthology.org/2024.tacl-1.31.pdf).
@@ -216,16 +216,16 @@ We optimize for **agent UX**: fewer tools, summaries, links, prompts, guardrails
 
 Returns `open_status`, `hours_prettified`, `next_change_iso`, and `stats` (how many OSM objects were evaluated).
 
-## 🗺 Roadmap
+## Roadmap
 
 - [ ] Optional route geometry stripping for token savings
 - [ ] npm publish + MCP registry listing
 
-## 🤝 Contributing
+## Contributing
 
 [CONTRIBUTING.md](CONTRIBUTING.md) — PRs welcome.
 
-## 📄 License
+## License
 
 Apache-2.0 · Data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright)
 
