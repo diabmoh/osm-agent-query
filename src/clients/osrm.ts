@@ -30,10 +30,12 @@ export async function getRoute(
   from: { lat: number; lon: number },
   to: { lat: number; lon: number },
   profile: RouteProfile = "foot",
+  options?: { includeGeometry?: boolean },
 ): Promise<RouteResult> {
   const p = PROFILE_MAP[profile];
   const coords = `${from.lon},${from.lat};${to.lon},${to.lat}`;
-  const url = `${OSRM_BASE}/route/v1/${p}/${coords}?overview=full&geometries=polyline`;
+  const overview = options?.includeGeometry ? "full" : "false";
+  const url = `${OSRM_BASE}/route/v1/${p}/${coords}?overview=${overview}&geometries=polyline`;
   const data = await osmJson<OsrmRouteResponse>(url);
   if (!data.routes?.length) {
     throw new Error(
@@ -44,7 +46,7 @@ export async function getRoute(
   return {
     distance_m: Math.round(route.distance),
     duration_s: Math.round(route.duration),
-    geometry_encoded: route.geometry,
+    geometry_encoded: route.geometry ?? "",
     profile,
   };
 }

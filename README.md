@@ -49,10 +49,12 @@ OpenStreetMap is the world's largest **open** geodata commons—but agents break
 | Workflows | MCP prompts + resources | DIY |
 | Reliability | Nominatim cache, Overpass retry | Varies |
 
-## Highlights (v0.3)
+## Highlights (v0.4)
 
+- **`search_open_now`** — POIs open right now via `opening_hours` evaluation
 - **Clickable links** on geocode, search, and route results (OpenStreetMap directions included)
 - **`compare_routes`** — foot + driving + cycling in one call
+- **`route` geometry opt-in** — polyline omitted by default to save tokens (`include_geometry: true` when needed)
 - **`map_links`** — shareable URLs for any coordinate
 - **MCP resources** — `osm-agent://guide`, `osm-agent://categories`
 - **MCP prompts** — outing planner, amenity audit, commute comparison
@@ -69,7 +71,7 @@ OpenStreetMap is the world's largest **open** geodata commons—but agents break
 | `search_nearby` | POIs by category, **sorted by distance**, links & highlights |
 | `search_open_now` | Same as nearby but **only open now** (evaluates `opening_hours`) |
 | `search_in_area` | POIs in a named place or bbox |
-| `route` | Distance, duration, polyline, **directions URL** |
+| `route` | Distance, duration, directions URL (geometry opt-in) |
 | `compare_routes` | Foot / drive / bike side-by-side + links |
 | `map_links` | Map, element, directions URLs for any point |
 | `explain_osm_tags` | Tag docs + category list |
@@ -194,7 +196,7 @@ npm run eval          # Live APIs (be gentle)
 Models generate invalid or expensive queries. We compile from validated intents—see [Text-to-OverpassQL](https://aclanthology.org/2024.tacl-1.31.pdf).
 
 **Can agents edit the map?**  
-Not in v0.3 (read-only by design). Editing needs OAuth and changeset review.
+Not in v0.4 (read-only by design). Editing needs OAuth and changeset review.
 
 **Is public Nominatim OK for production?**  
 Fine for demos and agent sessions. Production apps should self-host.
@@ -218,7 +220,7 @@ Returns `open_status`, `hours_prettified`, `next_change_iso`, and `stats` (how m
 
 ## Roadmap
 
-- [ ] Optional route geometry stripping for token savings
+- [x] Optional route geometry stripping for token savings
 - [ ] npm publish + MCP registry listing
 
 ## Contributing

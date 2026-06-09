@@ -112,7 +112,7 @@ export function registerOsmTools(server: McpServer): void {
     "route",
     {
       description:
-        "Walking, driving, or cycling route between two coordinates via OSRM. Returns distance, duration, and encoded polyline.",
+        "Walking, driving, or cycling route between two coordinates via OSRM. Returns distance, duration, and directions link. Set include_geometry true only when you need the encoded polyline for map rendering.",
       inputSchema: routeSchema.shape,
     },
     async (args) => runTool(() => handleRoute(routeSchema.parse(args))),

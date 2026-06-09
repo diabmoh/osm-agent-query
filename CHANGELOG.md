@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.1] - 2026-06-09
+
+### Added
+
+- `include_geometry` on `route` (default `false`) — omits encoded polyline from responses and skips geometry in OSRM requests unless explicitly needed
+
+### Changed
+
+- `DEFAULT_USER_AGENT` now derives from `VERSION` instead of a hardcoded string
+
 ## [0.4.0] - 2026-06-01
 
 ### Added

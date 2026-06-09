@@ -1,6 +1,8 @@
+import { VERSION } from "./version.js";
+
 export const DEFAULT_USER_AGENT =
   process.env.OSM_USER_AGENT ??
-  "osm-agent-query/0.4.0 (MCP server; https://github.com/diabmoh/osm-agent-query)";
+  `osm-agent-query/${VERSION} (MCP server; https://github.com/diabmoh/osm-agent-query)`;
 
 export const NOMINATIM_BASE =
   process.env.NOMINATIM_URL ?? "https://nominatim.openstreetmap.org";

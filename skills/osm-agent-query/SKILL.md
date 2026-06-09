@@ -27,7 +27,7 @@ Skip for: reviews, traffic, indoor maps, non-geographic facts.
 | **Open right now** | `search_open_now` (not `search_nearby`) |
 | Survey a neighborhood | `search_in_area` or prompt `neighborhood_amenity_audit` |
 | Walk vs drive | `compare_routes` |
-| Single mode route | `route` |
+| Single mode route | `route` (set `include_geometry: true` only to draw on a map) |
 | Share map URL | `map_links` or use `links` on search results |
 | Debug empty search | `preview_query` |
 

@@ -13,6 +13,13 @@ export const routeSchema = z.object({
     .enum(["foot", "driving", "cycling"])
     .optional()
     .default("foot"),
+  include_geometry: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe(
+      "Include encoded polyline geometry (large). Default false to save tokens; set true only when drawing the route on a map.",
+    ),
 });
 
 export async function handleRoute(args: z.infer<typeof routeSchema>) {
@@ -22,16 +29,16 @@ export async function handleRoute(args: z.infer<typeof routeSchema>) {
     { lat: args.from_lat, lon: args.from_lon },
     { lat: args.to_lat, lon: args.to_lon },
     args.profile,
+    { includeGeometry: args.include_geometry },
   );
   const minutes = Math.round(route.duration_s / 60);
   const from = { lat: args.from_lat, lon: args.from_lon };
   const to = { lat: args.to_lat, lon: args.to_lon };
-  const data = {
+  const data: Record<string, unknown> = {
     profile: route.profile,
     distance_m: route.distance_m,
     duration_s: route.duration_s,
     duration_human: `${minutes} min`,
-    geometry_encoded: route.geometry_encoded,
     links: {
       directions: osmDirectionUrl(
         from,
@@ -44,6 +51,9 @@ export async function handleRoute(args: z.infer<typeof routeSchema>) {
       ),
     },
   };
+  if (args.include_geometry && route.geometry_encoded) {
+    data.geometry_encoded = route.geometry_encoded;
+  }
   return toolSuccess(
     `${args.profile} route: ${route.distance_m} m, ~${minutes} min.`,
     data,
